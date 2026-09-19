@@ -17,6 +17,6 @@ export function getConfig(env = process.env) {
     port,
     databasePath: env.DATABASE_PATH ?? './data/unibot.sqlite',
     maxToken: env.MAX_BOT_TOKEN ?? '',
-    maxApiBaseUrl: env.MAX_API_BASE_URL ?? 'https://platform-api.max.ru',
+    maxApiBaseUrl: env.MAX_API_BASE_URL ?? 'https://platform-api2.max.ru',
   };
 }

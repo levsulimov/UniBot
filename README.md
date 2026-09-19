@@ -29,7 +29,7 @@ npm start
 | `MAX_BOT_TOKEN` | да | токен бота MAX |
 | `PORT` | нет | порт HTTP-сервера, по умолчанию `3000` |
 | `DATABASE_PATH` | нет | путь к SQLite, по умолчанию `./data/unibot.sqlite` |
-| `MAX_API_BASE_URL` | нет | URL API MAX, по умолчанию `https://platform-api.max.ru` |
+| `MAX_API_BASE_URL` | нет | URL API MAX, по умолчанию `https://platform-api2.max.ru` |
 
 ## Проверка
 
