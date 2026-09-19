@@ -4,7 +4,8 @@
 
 ## Архитектура
 
-- `src/server.js` принимает вебхуки MAX на `POST /max/webhook` и передаёт нормализованное событие сервису.
+- `src/max-client.js` получает обновления MAX через long polling при запуске процесса; отдельная настройка webhook и публичный URL для локального запуска не требуются.
+- `src/server.js` запускает HTTP-проверку `GET /health`; `POST /max/webhook` оставлен как совместимый дополнительный способ доставки событий.
 - `src/max-client.js` отправляет сообщения через официальный endpoint MAX Bot API `POST /messages` с Bearer-токеном и inline-клавиатурой.
 - `src/bot-service.js` содержит конечный автомат сценария и не знает деталей HTTP/MAX.
 - `src/user-repository.js` хранит профиль в SQLite. Таблица `users` содержит `max_user_id`, `role`, `study_group`, `created_at`, `updated_at`; файл базы по умолчанию — `data/unibot.sqlite`, поэтому группа переживает перезапуск процесса.
@@ -20,7 +21,7 @@ set -a; . ./.env; set +a
 npm start
 ```
 
-Укажите в настройках вебхука MAX публичный адрес `https://<ваш-домен>/max/webhook`. Проверка работоспособности сервера: `GET /health`.
+После `npm start` бот начинает получать обновления MAX через long polling с токеном из `.env`; настраивать webhook или туннель для локального запуска не нужно. Проверка работоспособности сервера: `GET /health`.
 
 ## Переменные окружения
 
