@@ -2,7 +2,8 @@ import http from 'node:http';
 import { getConfig } from './config.js';
 import { UserRepository } from './user-repository.js';
 import { BotService } from './bot-service.js';
-import { MaxClient, parseMaxUpdate, runPolling } from './max-client.js';
+import { MaxClient, runPolling } from './max-client.js';
+import { processUpdate } from './update-handler.js';
 
 function readJson(request) {
   return new Promise((resolve, reject) => {
@@ -12,13 +13,6 @@ function readJson(request) {
     request.on('end', () => { try { resolve(JSON.parse(raw || '{}')); } catch { reject(new Error('Invalid JSON')); } });
     request.on('error', reject);
   });
-}
-
-export async function processUpdate({ update, service, client }) {
-  const event = parseMaxUpdate(update);
-  if (!event) return;
-  const replies = await service.handle(event);
-  for (const reply of replies) await client.send(event.chatId, reply);
 }
 
 export function createServer({ service, client }) {
