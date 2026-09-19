@@ -13,7 +13,14 @@ export class UserRepository {
         study_group TEXT,
         created_at TEXT NOT NULL,
         updated_at TEXT NOT NULL
-      )
+      );
+      CREATE TABLE IF NOT EXISTS bot_messages (
+        message_id TEXT PRIMARY KEY,
+        max_user_id TEXT NOT NULL,
+        chat_id TEXT NOT NULL,
+        created_at TEXT NOT NULL
+      );
+      CREATE INDEX IF NOT EXISTS bot_messages_user_idx ON bot_messages(max_user_id);
     `);
   }
 
@@ -48,6 +55,25 @@ export class UserRepository {
   touch(maxUserId) {
     this.db.prepare('UPDATE users SET updated_at = ? WHERE max_user_id = ?')
       .run(new Date().toISOString(), String(maxUserId));
+  }
+
+  rememberBotMessage({ messageId, maxUserId, chatId }) {
+    if (!messageId) return;
+    this.db.prepare(`
+      INSERT OR IGNORE INTO bot_messages (message_id, max_user_id, chat_id, created_at)
+      VALUES (?, ?, ?, ?)
+    `).run(String(messageId), String(maxUserId), String(chatId), new Date().toISOString());
+  }
+
+  getBotMessages(maxUserId) {
+    return this.db.prepare(`
+      SELECT message_id AS messageId, chat_id AS chatId
+      FROM bot_messages WHERE max_user_id = ? ORDER BY created_at
+    `).all(String(maxUserId));
+  }
+
+  forgetBotMessage(messageId) {
+    this.db.prepare('DELETE FROM bot_messages WHERE message_id = ?').run(String(messageId));
   }
 
   close() { this.db.close(); }

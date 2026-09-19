@@ -33,16 +33,16 @@ test('freshman without group receives group prompt', async (t) => {
 test('freshman group is saved and menu is displayed', async (t) => {
   const { users, bot } = setup(); t.after(() => users.close());
   await bot.handle({ userId: '4', payload: 'role:freshman' });
-  const replies = await bot.handle({ userId: '4', text: 'ЭК-101' });
-  assert.equal(users.get('4').studyGroup, 'ЭК-101');
-  assert.equal(replies[0].text, '✅ Группа ЭК-101 сохранена.');
+  const replies = await bot.handle({ userId: '4', text: 'ПИ25-2' });
+  assert.equal(users.get('4').studyGroup, 'ПИ25-2');
+  assert.equal(replies[0].text, '✅ Группа ПИ25-2 сохранена.');
   assert.equal(replies[1].kind, 'freshman-menu');
 });
 
 test('returning freshman with saved group sees menu without a prompt', async (t) => {
   const { users, bot } = setup(); t.after(() => users.close());
   await bot.handle({ userId: '5', payload: 'role:freshman' });
-  await bot.handle({ userId: '5', text: 'ЭК-101' });
+  await bot.handle({ userId: '5', text: 'ПИ25-2' });
   const [reply] = await bot.handle({ userId: '5', payload: 'role:freshman' });
   assert.equal(reply.kind, 'freshman-menu');
 });
@@ -52,9 +52,9 @@ test('SQLite profile persists after repository restart', async (t) => {
   const first = new UserRepository(filename);
   const bot = new BotService(first);
   await bot.handle({ userId: '6', payload: 'role:freshman' });
-  await bot.handle({ userId: '6', text: 'ЭК-101' });
+  await bot.handle({ userId: '6', text: 'ПИ25-2' });
   first.close();
   const second = new UserRepository(filename);
   t.after(() => { second.close(); });
-  assert.equal(second.get('6').studyGroup, 'ЭК-101');
+  assert.equal(second.get('6').studyGroup, 'ПИ25-2');
 });

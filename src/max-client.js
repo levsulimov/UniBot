@@ -27,6 +27,17 @@ export class MaxClient {
       body: JSON.stringify(body),
     });
     if (!response.ok) throw new Error(`MAX API responded with HTTP ${response.status}.`);
+    const result = await response.json().catch(() => null);
+    return result?.message_id ?? result?.message?.message_id ?? null;
+  }
+
+  /** Deletes one bot message using the MAX Bot API. */
+  async deleteMessage(messageId) {
+    const response = await this.fetch(`${this.baseUrl}/messages/${encodeURIComponent(messageId)}`, {
+      method: 'DELETE',
+      headers: this.headers,
+    });
+    if (!response.ok) throw new Error(`MAX API delete responded with HTTP ${response.status}.`);
   }
 
   /** Requests the next MAX updates batch. `marker` makes processing resumable. */
@@ -49,8 +60,9 @@ export function parseMaxUpdate(update) {
   const chatId = message?.recipient?.chat_id ?? message?.chat_id;
   const text = message?.body?.text ?? message?.text;
   const payload = update.callback?.payload;
+  const isCallback = Boolean(update.callback);
   if (!userId || !chatId) return null;
-  return { userId: String(userId), chatId, text, payload };
+  return { userId: String(userId), chatId, text, payload, isCallback };
 }
 
 /**

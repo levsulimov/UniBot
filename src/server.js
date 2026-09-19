@@ -27,7 +27,7 @@ export function createServer({ service, client }) {
       response.writeHead(404).end(); return;
     }
     try {
-      await processUpdate({ update: await readJson(request), service, client });
+      await processUpdate({ update: await readJson(request), service, users, client });
       response.writeHead(200).end();
     } catch (error) {
       console.error('Webhook processing error:', error);
@@ -45,7 +45,7 @@ const shutdown = new AbortController();
 
 server.listen(config.port, () => {
   console.log(`UniBot is listening on port ${config.port}`);
-  runPolling({ client, signal: shutdown.signal, onUpdate: (update) => processUpdate({ update, service, client }) });
+  runPolling({ client, signal: shutdown.signal, onUpdate: (update) => processUpdate({ update, service, users, client }) });
 });
 
 process.once('SIGINT', () => { shutdown.abort(); server.close(); users.close(); });
