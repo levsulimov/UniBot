@@ -64,3 +64,35 @@ test('an unsupported MAX update is ignored without sending a reply', async (t) =
   });
   assert.equal(handled, false);
 });
+
+test('group input is saved after freshman callback even if MAX reports another message user id', async (t) => {
+  const users = new UserRepository(':memory:');
+  t.after(() => users.close());
+  const bot = new BotService(users);
+  let sentId = 0;
+  const client = {
+    deleteMessage: async () => {},
+    send: async () => `bot-${++sentId}`,
+  };
+
+  await processUpdate({
+    update: { callback: { user_id: 42, payload: 'role:freshman', message: { recipient: { chat_id: 99 } } } },
+    service: bot,
+    users,
+    client,
+  });
+  assert.deepEqual({ ...users.getPendingGroupChat('99') }, { maxUserId: '42' });
+
+  await processUpdate({
+    update: {
+      message: { sender: { user_id: 77 }, recipient: { chat_id: 99 }, body: { text: 'ПИ25-2' } },
+    },
+    service: bot,
+    users,
+    client,
+  });
+
+  assert.equal(users.get('77').role, 'freshman');
+  assert.equal(users.get('77').studyGroup, 'ПИ25-2');
+  assert.equal(users.getPendingGroupChat('99'), null);
+});

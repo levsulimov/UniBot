@@ -21,6 +21,11 @@ export class UserRepository {
         created_at TEXT NOT NULL
       );
       CREATE INDEX IF NOT EXISTS bot_messages_user_idx ON bot_messages(max_user_id);
+      CREATE TABLE IF NOT EXISTS pending_group_chats (
+        chat_id TEXT PRIMARY KEY,
+        max_user_id TEXT NOT NULL,
+        created_at TEXT NOT NULL
+      );
     `);
   }
 
@@ -74,6 +79,23 @@ export class UserRepository {
 
   forgetBotMessage(messageId) {
     this.db.prepare('DELETE FROM bot_messages WHERE message_id = ?').run(String(messageId));
+  }
+
+  expectGroupInChat({ chatId, maxUserId }) {
+    this.db.prepare(`
+      INSERT INTO pending_group_chats (chat_id, max_user_id, created_at)
+      VALUES (?, ?, ?)
+      ON CONFLICT(chat_id) DO UPDATE SET max_user_id = excluded.max_user_id, created_at = excluded.created_at
+    `).run(String(chatId), String(maxUserId), new Date().toISOString());
+  }
+
+  getPendingGroupChat(chatId) {
+    return this.db.prepare('SELECT max_user_id AS maxUserId FROM pending_group_chats WHERE chat_id = ?')
+      .get(String(chatId)) ?? null;
+  }
+
+  clearPendingGroupChat(chatId) {
+    this.db.prepare('DELETE FROM pending_group_chats WHERE chat_id = ?').run(String(chatId));
   }
 
   close() { this.db.close(); }

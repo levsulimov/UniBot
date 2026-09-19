@@ -23,15 +23,15 @@ export class BotService {
     try {
       if (text === '/start') {
         this.users.touch(userId);
-        return [{ text: START_TEXT, keyboard: [[{ text: '🎓 Абитуриент', payload: 'role:applicant' }], [{ text: '👨‍🎓 Первокурсник', payload: 'role:freshman' }]], kind: 'role' }];
+        return [{ text: START_TEXT, keyboard: [[{ text: '🎓 Я абитуриент', payload: 'role:applicant' }], [{ text: '👨‍🎓 Я первокурсник', payload: 'role:freshman' }]], kind: 'role' }];
       }
 
       const action = payload ?? text;
-      if (action === '🎓 Абитуриент' || action === 'role:applicant') {
+      if (action === '🎓 Я абитуриент' || action === 'role:applicant') {
         this.users.setRole(userId, 'applicant');
         return [this.applicantMenu()];
       }
-      if (action === '👨‍🎓 Первокурсник' || action === 'role:freshman') {
+      if (action === '👨‍🎓 Я первокурсник' || action === 'role:freshman') {
         const user = this.users.setRole(userId, 'freshman');
         return user.studyGroup ? [this.freshmanMenu()] : [{ text: GROUP_PROMPT, kind: 'group-prompt' }];
       }

@@ -12,7 +12,7 @@ test('/start shows a role selector', async (t) => {
   const { users, bot } = setup(); t.after(() => users.close());
   const [reply] = await bot.handle({ userId: '1', text: '/start' });
   assert.equal(reply.text, messages.START_TEXT);
-  assert.deepEqual(reply.keyboard.map(([button]) => button.text), ['🎓 Абитуриент', '👨‍🎓 Первокурсник']);
+  assert.deepEqual(reply.keyboard.map(([button]) => button.text), ['🎓 Я абитуриент', '👨‍🎓 Я первокурсник']);
 });
 
 test('applicant selection persists role and opens applicant menu', async (t) => {
